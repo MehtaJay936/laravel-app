@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\playerStoreRequest;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\TeamPlayer;
@@ -12,32 +13,23 @@ class PlayerController extends Controller
 {
     public function index()
     {
-        $assignedIds = TeamPlayer::pluck('player_id');
-        $unassignedPlayers = Player::whereNotIn('id', $assignedIds)->get();
-        $teams = Team::with('players')->get();
+        $players = Player::all();
 
         return response()->json([
-            'unassignedPlayers' => $unassignedPlayers,
-            'teams' => $teams,
+            'players' => $players,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(playerStoreRequest $request)
     {
-        TeamPlayer::truncate();
+        info($request);
 
-        foreach ($request->teams as $team) {
-            foreach ($team['players'] as $player) {
-                TeamPlayer::insert([
-                    'team_id'    => $team['team_id'],
-                    'player_id'  => $player['player_id'],
-                    'sort_order' => $player['sort_order'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
+        $player = Player::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'date_of_birth' => $request->date_of_birth,
+        ]);
 
-        return response()->json(['message' => 'Saved successfully']);
+        return response()->json(['data' => $player, 'message' => 'Saved successfully']);
     }
 }
