@@ -130,7 +130,7 @@ const headersList = [
 
         <v-dialog v-model="editDialog" max-width="1000">
           <v-card title="Edit Player">
-            <v-form ref="form" v-model="valid" @submit.prevent="updatePlayer()">
+            <v-form ref="form" v-model="valid">
               <v-container>
                 <v-row>
                   <v-col cols="12" md="4">
@@ -156,7 +156,7 @@ const headersList = [
             <v-card-actions class="bg-surface-light">
               <v-btn text="Cancel" variant="plain" @click="editDialog = false"></v-btn>
 
-              <v-btn text="Save" color="primary" type="submit" :loading="loading" :disabled="loading"></v-btn>
+              <v-btn text="Save" color="primary" @click="updatePlayer()" :loading="loading" :disabled="loading"></v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
