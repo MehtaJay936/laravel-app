@@ -5,6 +5,7 @@ import { defineStore } from "pinia";
 export const usePlayerStore = defineStore("player", () => {
     const playersData = ref([]);
     const playerForm = reactive({
+        id: "",
         name: "",
         email: "",
         date_of_birth: "",
@@ -29,5 +30,36 @@ export const usePlayerStore = defineStore("player", () => {
         }
     };
 
-    return { playersData, playerForm, getPlayers, createPlayer };
+    const fetchPlayer = async (id) => {
+        try {
+            const {data} = await axios.get(`/api/players/${id}`);
+
+            Object.assign(playerForm, data);
+        } catch (error) {
+            console.error("Error fetching player:", error);
+            throw error;
+        }
+    };
+
+    const updatePlayer = async () => {
+        try {
+            const response = await axios.put(`/api/players/${playerForm.id}`, playerForm);
+            return response.data;
+        } catch (error) {
+            console.error("Error updating player:", error);
+            throw error;
+        }
+    };
+
+    const deletePlayer = async (id) => {
+        try {
+            const response = await axios.delete(`/api/players/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error deleting player:", error);
+            throw error;
+        }
+    };
+
+    return { playersData, playerForm, getPlayers, createPlayer, fetchPlayer, updatePlayer, deletePlayer };
 });
