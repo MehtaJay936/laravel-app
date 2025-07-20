@@ -14,6 +14,30 @@ const valid = ref(false)
 const loading = ref(false)
 const currentID = ref(null)
 
+const nameRules = [
+  value => {
+    if (value) return true
+
+    return 'Name is required.'
+  },
+]
+
+const emailRules = [
+  value => {
+    if (value) return true
+
+    return 'Email is required.'
+  },
+]
+
+const dateRules = [
+  value => {
+    if (value) return true
+
+    return 'Date of Birth is required.'
+  },
+]
+
 onMounted(async () => {
   await playerStore.getPlayers();
 })
@@ -32,6 +56,9 @@ const updatePlayer = () => {
       loading.value = false
       editDialog.value = false;
       playerStore.getPlayers();
+    })
+    .catch(() => {
+      loading.value = false
     });
 }
 
@@ -47,7 +74,10 @@ const deletePlayer = () => {
       loading.value = false
       deleteDialog.value = false;
       playerStore.getPlayers();
-    });
+    })
+    .catch(() => {
+      loading.value = false
+    });;
 }
 
 const headersList = [
@@ -100,7 +130,7 @@ const headersList = [
 
         <v-dialog v-model="editDialog" max-width="1000">
           <v-card title="Edit Player">
-            <v-form ref="form" v-model="valid" @submit.prevent="">
+            <v-form ref="form" v-model="valid" @submit.prevent="updatePlayer()">
               <v-container>
                 <v-row>
                   <v-col cols="12" md="4">
@@ -126,7 +156,7 @@ const headersList = [
             <v-card-actions class="bg-surface-light">
               <v-btn text="Cancel" variant="plain" @click="editDialog = false"></v-btn>
 
-              <v-btn text="Save" color="primary" @click="updatePlayer()" :loading="loading" :disabled="loading"></v-btn>
+              <v-btn text="Save" color="primary" type="submit" :loading="loading" :disabled="loading"></v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
