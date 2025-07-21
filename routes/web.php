@@ -26,6 +26,12 @@ Route::get('/players/create', function () {
     return Inertia::render('Players/Create');
 })->middleware(['auth', 'verified'])->name('players-create');
 
+Route::get('/players/{id}/edit', function ($id) {
+    return Inertia::render('Players/[id]/Edit', [
+        'id' => $id
+    ]);
+})->middleware(['auth', 'verified'])->name('players-edit');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -1,66 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { usePlayerStore } from '@/Store/playerStore.js'
 import { storeToRefs } from 'pinia';
 
 const playerStore = usePlayerStore();
-const { playerForm, playersData } = storeToRefs(playerStore);
-const editDialog = ref(false);
+const { playersData } = storeToRefs(playerStore);
 const deleteDialog = ref(false)
 const search = ref('');
-const valid = ref(false)
 const loading = ref(false)
 const currentID = ref(null)
 
-const nameRules = [
-  value => {
-    if (value) return true
-
-    return 'Name is required.'
-  },
-]
-
-const emailRules = [
-  value => {
-    if (value) return true
-
-    return 'Email is required.'
-  },
-]
-
-const dateRules = [
-  value => {
-    if (value) return true
-
-    return 'Date of Birth is required.'
-  },
-]
-
-onMounted(async () => {
+onBeforeMount(async () => {
   await playerStore.getPlayers();
 })
-
-const editPlayer = async (id) => {
-  currentID.value = id;
-
-  await playerStore.fetchPlayer(currentID.value);
-  editDialog.value = true;
-}
-
-const updatePlayer = () => {
-  loading.value = true
-  playerStore.updatePlayer()
-    .then(() => {
-      loading.value = false
-      editDialog.value = false;
-      playerStore.getPlayers();
-    })
-    .catch(() => {
-      loading.value = false
-    });
-}
 
 const showDeleteDialog = (id) => {
   currentID.value = id;
@@ -113,53 +67,16 @@ const headersList = [
         <v-data-table :headers="headersList" :items="playersData" :search="search" class="elevation-1">
           <template v-slot:item.actions="{ item }">
             <div class="d-flex ga-2 justify-center">
-              <v-icon color="primary" icon="mdi-pencil" size="small" @click="editPlayer(item.id)" title="Edit">
-                <v-tooltip>
-                  Edit Player
-                </v-tooltip>
+              <Link :href="route('players-edit', item.id)">
+              <v-icon color="primary" icon="mdi-pencil" size="small" title="Edit">
               </v-icon>
+              </Link>
 
               <v-icon color="red" icon="mdi-delete" size="small" @click="showDeleteDialog(item.id)" title="Delete">
-                <v-tooltip>
-                  Delete Player
-                </v-tooltip>
               </v-icon>
             </div>
           </template>
         </v-data-table>
-
-        <v-dialog v-model="editDialog" max-width="1000">
-          <v-card title="Edit Player">
-            <v-form ref="form" v-model="valid">
-              <v-container>
-                <v-row>
-                  <v-col cols="12" md="4">
-                    <v-text-field v-model="playerForm.name" :rules="nameRules" label="Name" variant="outlined" required
-                      clearable></v-text-field>
-                  </v-col>
-
-                  <v-col cols="12" md="4">
-                    <v-text-field v-model="playerForm.email" :rules="emailRules" label="E-mail" variant="outlined"
-                      required clearable></v-text-field>
-                  </v-col>
-
-                  <v-col cols="12" md="4">
-                    <v-text-field v-model="playerForm.date_of_birth" label="Date of Birth" variant="outlined" required
-                      type="date" clearable :rules="dateRules"></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-
-            <v-divider></v-divider>
-
-            <v-card-actions class="bg-surface-light">
-              <v-btn text="Cancel" variant="plain" @click="editDialog = false"></v-btn>
-
-              <v-btn text="Save" color="primary" @click="updatePlayer()" :loading="loading" :disabled="loading"></v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
 
         <v-dialog v-model="deleteDialog" max-width="1000">
           <v-card title="Delete Player">
