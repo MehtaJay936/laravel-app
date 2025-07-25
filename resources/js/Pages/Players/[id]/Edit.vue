@@ -38,20 +38,24 @@ const dateRules = [
 ]
 
 onBeforeMount(() => {
-    playerStore.fetchPlayer(page.props.id);
+  playerStore.fetchPlayer(page.props.id);
 })
 
-const updatePlayer = () => {
-  loading.value = true
-  playerStore.updatePlayer()
-    .then(() => {
-      loading.value = false
-      router.visit(route('players'));
-    })
-    .catch(() => {
-      loading.value = false
-    });
-}
+const updatePlayer = async () => {
+  const { valid } = await form.value.validate();
+
+  if (valid) {
+    loading.value = true
+    playerStore.updatePlayer()
+      .then(() => {
+        loading.value = false
+        router.visit(route('players'));
+      })
+      .catch(() => {
+        loading.value = false
+      });
+  }
+};
 
 </script>
 
@@ -65,6 +69,7 @@ const updatePlayer = () => {
 
         <v-form ref="form" v-model="valid" @submit.prevent="updatePlayer">
           <v-container>
+            {{ playerForm }}
             <v-row>
               <v-col cols="12" md="4">
                 <v-text-field v-model="playerForm.name" :rules="nameRules" label="Name" variant="outlined" required
@@ -79,6 +84,12 @@ const updatePlayer = () => {
               <v-col cols="12" md="4">
                 <v-text-field v-model="playerForm.date_of_birth" label="Date of Birth" variant="outlined" required
                   type="date" clearable :rules="dateRules"></v-text-field>
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-avatar v-if="playerForm.logo" size="80">
+                  <v-img :src="playerForm.logo" />
+                </v-avatar>
               </v-col>
             </v-row>
 

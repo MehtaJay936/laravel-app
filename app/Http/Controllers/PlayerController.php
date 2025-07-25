@@ -26,10 +26,18 @@ class PlayerController extends Controller
     public function store(playerStoreRequest $request)
     {
         try {
+            if ($request->hasFile('logo')) {
+                $file = $request->file('logo');
+                $originalName = $file->getClientOriginalName();
+                $path = $file->storeAs('players', $originalName, 'public');
+                $logoUrl = asset('storage/' . $path);
+            }
+
             $player = Player::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'date_of_birth' => $request->date_of_birth,
+                'logo' => $logoUrl,
             ]);
 
             return response()->json([

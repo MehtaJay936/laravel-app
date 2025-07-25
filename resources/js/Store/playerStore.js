@@ -9,6 +9,7 @@ export const usePlayerStore = defineStore("player", () => {
         name: "",
         email: "",
         date_of_birth: "",
+        logo: "",
     });
 
     const getPlayers = async () => {
@@ -22,7 +23,13 @@ export const usePlayerStore = defineStore("player", () => {
 
     const createPlayer = async () => {
         try {
-            const response = await axios.post("/api/players", playerForm);
+            const response = await axios.post("/api/players", playerForm,
+                {
+                    headers: {
+                        "Content-type": "multipart/form-data",
+                    },
+                }
+            );
             return response.data;
         } catch (error) {
             console.error("Error creating player:", error);
@@ -32,7 +39,7 @@ export const usePlayerStore = defineStore("player", () => {
 
     const fetchPlayer = async (id) => {
         try {
-            const {data} = await axios.get(`/api/players/${id}`);
+            const { data } = await axios.get(`/api/players/${id}`);
 
             Object.assign(playerForm, data);
         } catch (error) {
@@ -43,7 +50,15 @@ export const usePlayerStore = defineStore("player", () => {
 
     const updatePlayer = async () => {
         try {
-            const response = await axios.put(`/api/players/${playerForm.id}`, playerForm);
+            const response = await axios.put(
+                `/api/players/${playerForm.id}`,
+                playerForm,
+                {
+                    headers: {
+                        "Content-type": "multipart/form-data",
+                    },
+                }
+            );
             return response.data;
         } catch (error) {
             console.error("Error updating player:", error);
@@ -61,5 +76,13 @@ export const usePlayerStore = defineStore("player", () => {
         }
     };
 
-    return { playersData, playerForm, getPlayers, createPlayer, fetchPlayer, updatePlayer, deletePlayer };
+    return {
+        playersData,
+        playerForm,
+        getPlayers,
+        createPlayer,
+        fetchPlayer,
+        updatePlayer,
+        deletePlayer,
+    };
 });

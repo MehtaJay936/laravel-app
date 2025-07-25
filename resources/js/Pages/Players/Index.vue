@@ -39,6 +39,7 @@ const headersList = [
   { title: 'Name', key: 'name', align: 'center' },
   { title: 'Email', key: 'email', align: 'center' },
   { title: 'Date of  Birth', key: 'date_of_birth', align: 'center' },
+  { title: 'Logo', key: 'logo', align: 'center', sortable: false },
   { title: 'Actions', key: 'actions', align: 'center', sortable: false },
 ]
 </script>
@@ -65,6 +66,13 @@ const headersList = [
         <v-divider></v-divider>
 
         <v-data-table :headers="headersList" :items="playersData" :search="search" class="elevation-1">
+          <template v-slot:item.logo="{ item }">
+            <div class="d-flex justify-center">
+              <v-avtar width="50" height="50" rounded="xl">
+                <v-img :src="item.logo" width="50" height="50" cover rounded="xl"></v-img>
+              </v-avtar>
+            </div>
+          </template>
           <template v-slot:item.actions="{ item }">
             <div class="d-flex ga-2 justify-center">
               <Link :href="route('players-edit', item.id)">

@@ -24,7 +24,8 @@ class playerStoreRequest extends FormRequest
         return [
             'name' => 'required',
             'email' => 'required|email',
-            'date_of_birth' => 'required|date',
+            'date_of_birth' => 'nullable|date',
+            'logo' => 'nullable'
         ];
     }
 }

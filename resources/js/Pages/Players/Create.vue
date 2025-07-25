@@ -9,7 +9,7 @@ const playerStore = usePlayerStore();
 const { playerForm } = storeToRefs(playerStore);
 
 const valid = ref(false)
-const form = ref(null)
+const form = ref()
 const loading = ref(false)
 
 const nameRules = [
@@ -28,24 +28,20 @@ const emailRules = [
   },
 ]
 
-const dateRules = [
-  value => {
-    if (value) return true
-
-    return 'Date of Birth is required.'
-  },
-]
-
 const submit = async () => {
-  try {
-    loading.value = true;
+  const { valid } = await form.value.validate();
 
-    await playerStore.createPlayer();
-    router.visit(route('players'));
-  } catch (error) {
-    console.error('Error creating player:', error);
-  } finally {
-    loading.value = false;
+  if (valid) {
+    loading.value = true;
+    playerStore.createPlayer()
+      .then(() => {
+        loading.value = false;
+        router.visit(route('players'));
+      })
+      .catch((error) => {
+        loading.value = false;
+        console.error('Error creating player:', error);
+      });
   }
 };
 
@@ -61,6 +57,7 @@ const submit = async () => {
 
         <v-form ref="form" v-model="valid" @submit.prevent="submit">
           <v-container>
+            {{ playerForm }}
             <v-row>
               <v-col cols="12" md="4">
                 <v-text-field v-model="playerForm.name" :rules="nameRules" label="Name" variant="outlined" required
@@ -74,7 +71,11 @@ const submit = async () => {
 
               <v-col cols="12" md="4">
                 <v-text-field v-model="playerForm.date_of_birth" label="Date of Birth" variant="outlined" required
-                  type="date" clearable :rules="dateRules"></v-text-field>
+                  type="date" clearable></v-text-field>
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-file-input v-model="playerForm.logo" label="Logo" variant="outlined" required clearable></v-file-input>
               </v-col>
             </v-row>
 
